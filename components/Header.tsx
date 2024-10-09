@@ -5,13 +5,13 @@ function Header() {
     <header className="bg-red-300 py-4">
       <ul className="flex gap-4">
         <li className="p-2 bg-orange-500">
-          <Link href="/">Anasayfa</Link>
+          <Link href="/">Home</Link>
         </li>
         <li className="p-2 bg-orange-500">
-          <Link href="/about">Hakkımızda</Link>
+          <Link href="/about">About</Link>
         </li>
         <li className="p-2 bg-orange-500">
-          <Link href="/persons">Persons</Link>
+          <Link href="/products">Products</Link>
         </li>
       </ul>
     </header>

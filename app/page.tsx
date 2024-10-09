@@ -53,7 +53,11 @@ export default async function Home() {
       <div className="flex justify-between  gap-8">
         <div className="flex-1">
           <Suspense
-            fallback={<p className="text-center text-red-400">Loading...</p>}
+            fallback={
+              <p className="text-center text-red-400">
+                Loading Products Home...
+              </p>
+            }
           >
             <ProductList />
           </Suspense>
