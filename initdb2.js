@@ -232,7 +232,7 @@ try {
     INSERT INTO orders (product_id, customer_name, order_date) VALUES (?, ?, ?)
   `);
 
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 50; i++) {
     const customerName = chance.name(); // Rastgele müşteri adı
     const orderDate = chance.date({ string: true, year: 2024 }); // Rastgele sipariş tarihi
     insertOrder.run(i, customerName, orderDate);

@@ -14,5 +14,4 @@ export default async function EditPersonPage({
       <PersonForm person={personData} />
     </div>
   );
-  // }
 }

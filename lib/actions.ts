@@ -71,6 +71,57 @@ const userSchema = z.object({
 //   return null;
 // }
 
+export async function createProduct(formData: FormData): Promise<void> {
+  const db = connectToDatabase();
+
+  console.log("run create Product");
+
+  const formProductObj = {
+    name: formData.get("name"),
+    price: formData.get("price"),
+    stock: formData.get("stock"),
+  };
+
+  // const dataObj = userSchema.safeParse(formProductObj);
+
+  // Basit doğrulamalar
+  if ((formProductObj.name as string).length < 3) {
+    throw new Error("İsim en az 3 karakter uzunluğunda olmalı.");
+  }
+
+  // try-catch ile veritabanı işlemlerini yönet
+  try {
+    const createProductStmt = db.prepare(`
+        INSERT INTO products (name, price, stock)
+        VALUES (?, ?, ?)
+      `);
+
+    const result = createProductStmt.run(
+      formProductObj.name,
+      formProductObj.price,
+      formProductObj.stock
+    );
+
+    console.log("Kişi başarıyla oluşturuldu.", result);
+
+    return {
+      success: true, // Başarı durumu true
+      data: null, // Oluşturulan kişi bilgileri
+      errors: null, // Hata yok
+    };
+  } catch (error: any) {
+    console.error("Kişi oluşturulurken hata oluştu:", error.message);
+
+    return {
+      success: false, // Başarısız
+      data: null,
+      errors: { form: [error.message] }, // Genel form hatası
+    };
+  } finally {
+    db.close(); // Veritabanı bağlantısını kapat
+  }
+}
+
 export async function updatePerson(
   prevState: any,
   formData: FormData,

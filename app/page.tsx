@@ -1,5 +1,10 @@
 import ProductList from "@/components/ProductList";
-import { getAllOrders, getAllProducts, getAllSuppliers } from "@/lib/data";
+import { SubmitButton } from "@/components/SubmitButton";
+import {
+  getAllOrders,
+  getAllStockMovements,
+  getAllSuppliers,
+} from "@/lib/data";
 import Image from "next/image";
 import { Suspense } from "react";
 
@@ -8,9 +13,10 @@ export default async function Home() {
   // const orders = await getAllOrders();
   // const suppliers = await getAllSuppliers();
 
-  const [orders, suppliers] = await Promise.all([
+  const [orders, suppliers, stockMovements] = await Promise.all([
     getAllOrders(),
     getAllSuppliers(),
+    getAllStockMovements(),
   ]);
 
   // Promise.all([products, orders, suppliers]);
@@ -52,18 +58,6 @@ export default async function Home() {
       </section> */}
       <div className="flex justify-between  gap-8">
         <div className="flex-1">
-          <Suspense
-            fallback={
-              <p className="text-center text-red-400">
-                Loading Products Home...
-              </p>
-            }
-          >
-            <ProductList />
-          </Suspense>
-        </div>
-
-        <div className="flex flex-col gap-4">
           {/* Orders List */}
           <section className="mb-8">
             <h2 className="text-xl font-semibold mb-2">Orders</h2>
@@ -102,7 +96,9 @@ export default async function Home() {
               </tbody>
             </table>
           </section>
+        </div>
 
+        <div className="flex flex-col gap-4">
           {/* Suppliers List */}
           <section>
             <h2 className="text-xl font-semibold mb-2">Suppliers</h2>
@@ -141,8 +137,49 @@ export default async function Home() {
               </tbody>
             </table>
           </section>
+
+          {/* Suppliers List */}
+          <section>
+            <h2 className="text-xl font-semibold mb-2">Stock Movements</h2>
+            <table className="table-auto w-full border-collapse border border-gray-300">
+              <thead>
+                <tr>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Product ID
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Movement Type
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Movement Date
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Qauntity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stockMovements.map((stockMovement: any) => (
+                  <tr key={stockMovement.id}>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {stockMovement.product_id} product_id, movement_type,
+                      movement_date, quantity
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {stockMovement.movement_type}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {stockMovement.movement_date}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {stockMovement.quantity}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
         </div>
       </div>
+      <SubmitButton />
     </div>
   );
 }
