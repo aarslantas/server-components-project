@@ -1,4 +1,7 @@
 import { getAllProducts } from "@/lib/data";
+import Link from "next/link";
+import DeleteModal from "./DeleteModal";
+import { deleteProduct } from "@/lib/actions";
 
 export default async function ProductList() {
   const products = await getAllProducts();
@@ -30,8 +33,14 @@ export default async function ProductList() {
                 {product.stock}
               </td>
               <td className="border border-gray-300 px-4 py-2 flex justify-between gap-4">
-                <button className=" flex-1 bg-yellow-300  py-2">Edit</button>
-                <button className=" flex-1 bg-red-300  py-2">Delete</button>
+                <Link
+                  href={`/products/${product.id}/edit`}
+                  className=" flex-1 bg-yellow-300  py-2"
+                >
+                  Edit
+                </Link>
+                {/* <button className=" flex-1 bg-red-300  py-2">Delete</button> */}
+                <DeleteModal id={product.id} />
               </td>
             </tr>
           ))}

@@ -1,143 +1,149 @@
 "use server";
 import { z } from "zod";
+import { connectToDatabase } from "./data";
+
 const Database = require("better-sqlite3");
 const path = require("path");
 
-function connectToDatabase() {
-  const dbPath = path.resolve(process.cwd(), "database.db"); // Veritabanı dosyasının ismi ve uzantısı
-  return new Database(dbPath);
-}
-
-const userSchema = z.object({
-  name: z.string(),
-  // .min(2, "Name is required") // En az bir karakter olmalı
-  // .max(100, "Name must be less than 100 characters"), // Maksimum 100 karakter olabilir
-  age: z.string(),
-  // .number()
-  // .min(18, "You must be at least 18 years old") // Minimum yaş 18
-  // .max(120, "Age must be less than or equal to 120"), // Maksimum yaş 120
-  email: z.string().email("Invalid email format"), // Geçerli bir email formatı olmalı
+const productSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Product name is required") // En az 1 karakter olmalı
+    .max(100, "Product name must be less than 100 characters"), // Maksimum 100 karakter olabilir
+  price: z
+    .number()
+    .min(0.01, "Price must be greater than 0") // Fiyat 0'dan büyük olmalı
+    .max(1000000, "Price must be less than or equal to 1,000,000"), // Maksimum fiyat 1 milyon olabilir
+  stock: z
+    .number()
+    .min(0, "Stock cannot be negative") // Stok sıfır veya daha büyük olmalı
+    .max(10000, "Stock must be less than or equal to 10,000"), // Maksimum stok 10,000 olabilir
 });
 
-// export async function updatePerson(
-//   id: string,
-//   formData: FormData
-// ): Promise<null> {
-//   const name = formData.get("name") as string;
-//   const age = formData.get("age") as string;
-//   const email = formData.get("email") as string;
-
-//   // // Basit doğrulamalar
-//   // if (!name || name.length < 3) {
-//   //     throw new Error('İsim en az 3 karakter uzunluğunda olmalı.');
-//   // }
-//   // if (!email || !email.includes('@')) {
-//   //     throw new Error('Geçerli bir e-posta adresi girin.');
-//   // }
-//   // if (!age || isNaN(Number(age)) || Number(age) <= 0) {
-//   //     throw new Error('Yaş pozitif bir sayı olmalı.');
-//   // }
-
-//   // Validasyon başarılı olursa veriler döner
-
+// export async function createProduct(formData: FormData): Promise<void> {
 //   const db = connectToDatabase();
 
-//   try {
-//     const validation = userSchema.safeParse(formData);
+//   const formProductObj = {
+//     name: formData.get("name"),
+//     price: formData.get("price"),
+//     stock: formData.get("stock"),
+//   };
 
-//     if (!validation.success) {
-//       validation.error?.flatten().fieldErrors;
-//     }
+//   // const dataObj = userSchema.safeParse(formProductObj);
 
-//     const updatePerson = db.prepare(`
-//       UPDATE persons
-//       SET name = ?, age = ?, email = ?
-//       WHERE id = ?
-//     `);
-//     const result = updatePerson.run(name, age, email, id);
-
-//     if (result.changes === 0) {
-//       throw new Error(`ID'si ${id} olan kişi bulunamadı.`);
-//     }
-
-//     console.log("Kişi başarıyla güncellendi.");
-//   } catch (error: any) {
-//     console.error("Güncelleme sırasında hata oluştu:", error.message);
-//     throw error;
-//   } finally {
-//     db.close();
+//   // Basit doğrulamalar
+//   if ((formProductObj.name as string).length < 3) {
+//     throw new Error("İsim en az 3 karakter uzunluğunda olmalı.");
 //   }
 
-//   return null;
+//   // try-catch ile veritabanı işlemlerini yönet
+//   try {
+//     const createProductStmt = db.prepare(`
+//         INSERT INTO products (name, price, stock)
+//         VALUES (?, ?, ?)
+//       `);
+
+//     const result = createProductStmt.run(
+//       formProductObj.name,
+//       formProductObj.price,
+//       formProductObj.stock
+//     );
+
+//     console.log("Kişi başarıyla oluşturuldu.", result);
+
+//     return {
+//       success: true, // Başarı durumu true
+//       data: null, // Oluşturulan kişi bilgileri
+//       errors: null, // Hata yok
+//     };
+//   } catch (error: any) {
+//     console.error("Kişi oluşturulurken hata oluştu:", error.message);
+
+//     return {
+//       success: false, // Başarısız
+//       data: null,
+//       errors: { form: [error.message] }, // Genel form hatası
+//     };
+//   } finally {
+//     db.close(); // Veritabanı bağlantısını kapat
+//   }
 // }
 
-export async function createProduct(formData: FormData): Promise<void> {
+export async function createProduct(previousState: any, formData: FormData) {
   const db = connectToDatabase();
-
-  console.log("run create Product");
 
   const formProductObj = {
     name: formData.get("name"),
-    price: formData.get("price"),
-    stock: formData.get("stock"),
+    price: Number(formData.get("price")),
+    stock: Number(formData.get("stock")),
   };
 
-  // const dataObj = userSchema.safeParse(formProductObj);
+  console.log("formProductObj", formProductObj);
 
-  // Basit doğrulamalar
-  if ((formProductObj.name as string).length < 3) {
-    throw new Error("İsim en az 3 karakter uzunluğunda olmalı.");
+  const dataObj = productSchema.safeParse(formProductObj);
+
+  if (!dataObj.success) {
+    const plainErrors = dataObj.error?.flatten().fieldErrors;
+    return {
+      success: false,
+      data: null,
+      errors: plainErrors,
+    };
   }
 
-  // try-catch ile veritabanı işlemlerini yönet
   try {
-    const createProductStmt = db.prepare(`
-        INSERT INTO products (name, price, stock)
-        VALUES (?, ?, ?)
-      `);
+    const createProduct = db.prepare(`
+      INSERT INTO products (name, price, stock)
+      VALUES (?, ?, ?)
+    `);
 
-    const result = createProductStmt.run(
+    const result = createProduct.run(
       formProductObj.name,
       formProductObj.price,
       formProductObj.stock
     );
 
-    console.log("Kişi başarıyla oluşturuldu.", result);
+    if (result.changes === 0) {
+      throw new Error(`Ürün eklenemedi.`);
+    }
 
+    console.log("Ürün başarıyla oluşturuldu.");
     return {
-      success: true, // Başarı durumu true
-      data: null, // Oluşturulan kişi bilgileri
-      errors: null, // Hata yok
+      success: true,
+      data: formProductObj, // Eklenen ürün bilgileri
+      errors: null,
+      message: "Ürün başarıyla oluşturuldu",
     };
   } catch (error: any) {
-    console.error("Kişi oluşturulurken hata oluştu:", error.message);
+    console.error("Ürün oluşturulurken hata oluştu:", error.message);
 
     return {
-      success: false, // Başarısız
+      success: false,
       data: null,
       errors: { form: [error.message] }, // Genel form hatası
+      message: "Ürün oluşturulurken hata oluştu",
     };
   } finally {
-    db.close(); // Veritabanı bağlantısını kapat
+    db.close();
   }
 }
 
-export async function updatePerson(
+export async function updateProduct(
   prevState: any,
   formData: FormData,
   id: string
 ) {
   const db = connectToDatabase();
 
-  const formPersonObj = {
+  const formProductObj = {
     name: formData.get("name"),
-    age: formData.get("age"),
-    email: formData.get("email"),
+    price: Number(formData.get("price")),
+    stock: Number(formData.get("stock")),
   };
 
-  console.log("formPersonObj", formPersonObj);
+  console;
 
-  const dataObj = userSchema.safeParse(formPersonObj);
+  const dataObj = productSchema.safeParse(formProductObj);
 
   if (!dataObj.success) {
     const plainErrors = dataObj.error?.flatten().fieldErrors;
@@ -149,31 +155,33 @@ export async function updatePerson(
     };
   }
 
+  // await new Promise((resolve) => setTimeout(resolve, 10000));
+
   try {
-    const updatePerson = db.prepare(`
-            UPDATE persons
-            SET name = ?, age = ?, email = ?
+    const updateProduct = db.prepare(`
+            UPDATE products
+            SET name = ?, price = ?, stock = ?
             WHERE id = ?
           `);
 
-    const result = updatePerson.run(
-      formPersonObj.name,
-      formPersonObj.age,
-      formPersonObj.email,
+    const result = updateProduct.run(
+      formProductObj.name,
+      formProductObj.price,
+      formProductObj.stock,
       id
     );
 
     if (result.changes === 0) {
-      throw new Error(`ID'si ${id} olan kişi bulunamadı.`);
+      throw new Error(`ID'si ${id} olan ürün bulunamadı.`);
     }
 
-    console.log("Kişi başarıyla güncellendi.");
+    console.log("Ürün başarıyla güncellendi.");
 
     return {
       success: true, // Başarı durumu true
-      data: formPersonObj, // Güncellenen kişi bilgileri
+      data: formProductObj, // Güncellenen ürün bilgileri
       errors: null, // Hata yok
-      message: "Kişi basariyla guncellendi",
+      message: "Ürün başarıyla güncellendi",
     };
   } catch (error: any) {
     console.error("Güncelleme sırasında hata oluştu:", error.message);
@@ -186,67 +194,45 @@ export async function updatePerson(
     };
   } finally {
     db.close();
+    // revalidatePath("/products");
+    // redirect("/products");
   }
 }
 
-export async function createPerson(prevState: any, formData: FormData) {
+export async function deleteProduct(
+  previousState: any,
+  formData: FormData,
+  id: string
+) {
   const db = connectToDatabase();
 
-  console.log("runnnnnnn");
-
-  const formPersonObj = {
-    name: formData.get("name"),
-    age: formData.get("age"),
-    email: formData.get("email"),
-  };
-
-  console.log("formPersonObj", formPersonObj);
-
-  const dataObj = userSchema.safeParse(formPersonObj);
-
-  if (!dataObj.success) {
-    const plainErrors = dataObj.error?.flatten().fieldErrors;
-    console.log("plainErrors", plainErrors);
-    return {
-      success: false, // Başarı durumu false
-      data: prevState,
-      errors: plainErrors, // Zod hatalarını dön
-    };
-  }
-
-  // try-catch ile veritabanı işlemlerini yönet
   try {
-    const createPersonStmt = db.prepare(`
-        INSERT INTO persons (name, age, email)
-        VALUES (?, ?, ?)
-      `);
+    const deleteProduct = db.prepare(`
+            DELETE FROM products
+            WHERE id = ?
+          `);
 
-    const result = createPersonStmt.run(
-      formPersonObj.name,
-      formPersonObj.age,
-      formPersonObj.email
-    );
+    const result = deleteProduct.run(id);
 
-    console.log("Kişi başarıyla oluşturuldu.", result);
+    if (result.changes === 0) {
+      throw new Error(`ID'si ${id} olan ürün bulunamadı.`);
+    }
+
+    console.log("Ürün başarıyla silindi.");
 
     return {
       success: true, // Başarı durumu true
-      data: {
-        name: formPersonObj.name,
-        age: formPersonObj.age,
-        email: formPersonObj.email,
-      }, // Oluşturulan kişi bilgileri
-      errors: null, // Hata yok
+      message: "Ürün başarıyla silindi bayburt",
     };
   } catch (error: any) {
-    console.error("Kişi oluşturulurken hata oluştu:", error.message);
+    console.error("Silme sırasında hata oluştu:", error.message);
 
     return {
       success: false, // Başarısız
-      data: null,
       errors: { form: [error.message] }, // Genel form hatası
+      message: "Silme sırasında hata oluştu",
     };
   } finally {
-    db.close(); // Veritabanı bağlantısını kapat
+    db.close();
   }
 }

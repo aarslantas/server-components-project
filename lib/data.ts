@@ -2,7 +2,7 @@ const Database = require("better-sqlite3");
 const path = require("path");
 
 // Veritabanı bağlantısını açma fonksiyonu
-function connectToDatabase() {
+export function connectToDatabase() {
   const dbPath = path.resolve(process.cwd(), "stock.db"); // Veritabanı dosyasının ismi ve uzantısı
   return new Database(dbPath);
 }
@@ -11,7 +11,7 @@ function connectToDatabase() {
 export async function getAllProducts() {
   const db = connectToDatabase(); // Her işlem için yeni bağlantı
   try {
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const stmt = db.prepare("SELECT * FROM products");
     const products = stmt.all();
     return products;
@@ -75,6 +75,29 @@ export async function getAllStockMovements() {
       error.message
     );
     return [];
+  } finally {
+    db.close(); // Sorgudan sonra veritabanı bağlantısını kapat
+  }
+}
+
+export async function getProductById(id: string) {
+  const db = connectToDatabase(); // Her işlem için yeni bağlantı
+  try {
+    // await new Promise((resolve) => setTimeout(resolve, 10000)); // Simüle edilen gecikme
+    const stmt = db.prepare("SELECT * FROM products WHERE id = ?");
+    const product = stmt.get(id);
+
+    if (!product) {
+      throw new Error(`ID'si ${id} olan ürün bulunamadı.`);
+    }
+
+    return product;
+  } catch (error: any) {
+    console.error(
+      "Ürün veritabanından alınırken bir hata oluştu:",
+      error.message
+    );
+    return null;
   } finally {
     db.close(); // Sorgudan sonra veritabanı bağlantısını kapat
   }

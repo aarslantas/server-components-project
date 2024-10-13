@@ -160,8 +160,7 @@ export default async function Home() {
                 {stockMovements.map((stockMovement: any) => (
                   <tr key={stockMovement.id}>
                     <td className="border border-gray-300 px-4 py-2">
-                      {stockMovement.product_id} product_id, movement_type,
-                      movement_date, quantity
+                      {stockMovement.product_id}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {stockMovement.movement_type}
