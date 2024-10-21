@@ -1,9 +1,9 @@
 import ProductForm from "@/components/ProductForm";
 import ProductList from "@/components/ProductList";
 import { createProduct } from "@/lib/actions";
-import { Suspense } from "react";
+import { Suspense, useCallback, useState } from "react";
 
-export default async function CreateProductPage() {
+export default function CreateProductPage() {
   return (
     <div className="container">
       <ProductForm />

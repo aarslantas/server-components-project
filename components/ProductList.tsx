@@ -1,13 +1,12 @@
 import { getAllProducts } from "@/lib/data";
 import Link from "next/link";
 import DeleteModal from "./DeleteModal";
-import { deleteProduct } from "@/lib/actions";
 
 export default async function ProductList() {
   const products = await getAllProducts();
 
   return (
-    <section className="mb-8">
+    <div className="mb-8 max-w-4xl">
       <h2 className="text-xl font-semibold mb-2">Products</h2>
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>
@@ -40,12 +39,12 @@ export default async function ProductList() {
                   Edit
                 </Link>
                 {/* <button className=" flex-1 bg-red-300  py-2">Delete</button> */}
-                <DeleteModal id={product.id} />
+                {/* <DeleteModal id={product.id} /> */}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </section>
+    </div>
   );
 }

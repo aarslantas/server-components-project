@@ -1,7 +1,7 @@
 "use client";
 
 import { createProduct, updateProduct } from "@/lib/actions";
-import { FC, useEffect, useRef } from "react";
+import { FC, useActionState, useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import { SubmitButton } from "./SubmitButton";
 import { useRouter } from "next/navigation";
@@ -42,10 +42,9 @@ export default function ProductForm({ product }: { product?: any }) {
     },
     null
   );
+
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null); // Form'a referans ekliyoruz
-
-  console.log("state", state);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;

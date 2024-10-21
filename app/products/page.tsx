@@ -16,7 +16,9 @@ export default async function ProductPage() {
           </p>
         }
       >
-        <ProductList />
+        <div className="p-2">
+          <ProductList />
+        </div>
       </Suspense>
     </div>
   );
