@@ -16,10 +16,14 @@ export async function getAllProducts() {
     const products = stmt.all();
     return products;
   } catch (error) {
-    console.error(
-      "Ürünler veritabanından alınırken bir hata oluştu:",
-      error.message
-    );
+    if (error instanceof Error) {
+      console.error(
+        "Ürünler veritabanından alınırken bir hata oluştu:",
+        error.message
+      );
+    } else {
+      console.error("Bilinmeyen bir hata oluştu:", error);
+    }
     return [];
   } finally {
     db.close(); // Sorgudan sonra veritabanı bağlantısını kapat
@@ -34,10 +38,14 @@ export async function getAllOrders() {
     const orders = stmt.all();
     return orders;
   } catch (error) {
-    console.error(
-      "Siparişler veritabanından alınırken bir hata oluştu:",
-      error.message
-    );
+    if (error instanceof Error) {
+      console.error(
+        "Ürünler veritabanından alınırken bir hata oluştu:",
+        error.message
+      );
+    } else {
+      console.error("Bilinmeyen bir hata oluştu:", error);
+    }
     return [];
   } finally {
     db.close(); // Sorgudan sonra veritabanı bağlantısını kapat
@@ -52,10 +60,14 @@ export async function getAllSuppliers() {
     const suppliers = stmt.all();
     return suppliers;
   } catch (error) {
-    console.error(
-      "Tedarikçiler veritabanından alınırken bir hata oluştu:",
-      error.message
-    );
+    if (error instanceof Error) {
+      console.error(
+        "Ürünler veritabanından alınırken bir hata oluştu:",
+        error.message
+      );
+    } else {
+      console.error("Bilinmeyen bir hata oluştu:", error);
+    }
     return [];
   } finally {
     db.close(); // Sorgudan sonra veritabanı bağlantısını kapat
@@ -70,10 +82,14 @@ export async function getAllStockMovements() {
     const stockMovements = stmt.all();
     return stockMovements;
   } catch (error) {
-    console.error(
-      "Stok hareketleri veritabanından alınırken bir hata oluştu:",
-      error.message
-    );
+    if (error instanceof Error) {
+      console.error(
+        "Ürünler veritabanından alınırken bir hata oluştu:",
+        error.message
+      );
+    } else {
+      console.error("Bilinmeyen bir hata oluştu:", error);
+    }
     return [];
   } finally {
     db.close(); // Sorgudan sonra veritabanı bağlantısını kapat
