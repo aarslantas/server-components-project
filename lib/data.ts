@@ -11,7 +11,7 @@ export function connectToDatabase() {
 export async function getAllProducts() {
   const db = connectToDatabase(); // Her işlem için yeni bağlantı
   try {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const stmt = db.prepare("SELECT * FROM products");
     const products = stmt.all();
     return products;

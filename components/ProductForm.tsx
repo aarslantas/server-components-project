@@ -44,7 +44,7 @@ export default function ProductForm({ product }: { product?: any }) {
   );
 
   const router = useRouter();
-  const formRef = useRef<HTMLFormElement>(null); // Form'a referans ekliyoruz
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
