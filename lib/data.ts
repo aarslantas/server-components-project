@@ -3,11 +3,10 @@ const path = require("path");
 
 // Veritabanı bağlantısını açma fonksiyonu
 export function connectToDatabase() {
-  const dbPath = path.resolve(process.cwd(), "stock.db"); // Veritabanı dosyasının ismi ve uzantısı
+  const dbPath = path.resolve(process.cwd(), "stock.db");
   return new Database(dbPath);
 }
 
-// Products için getAll metodu
 export async function getAllProducts() {
   const db = connectToDatabase(); // Her işlem için yeni bağlantı
   try {
