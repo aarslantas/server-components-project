@@ -7,6 +7,27 @@ export function connectToDatabase() {
   return new Database(dbPath);
 }
 
+export async function getAllCountries() {
+  const db = connectToDatabase();
+  try {
+    const stmt = db.prepare("SELECT * FROM countries");
+    const countries = stmt.all();
+    return countries;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(
+        "Ülkeler veritabanından alınırken bir hata oluştu:",
+        error.message
+      );
+    } else {
+      console.error("Bilinmeyen bir hata oluştu:", error);
+    }
+    return [];
+  } finally {
+    db.close();
+  }
+}
+
 export async function getAllProducts() {
   const db = connectToDatabase(); // Her işlem için yeni bağlantı
   try {

@@ -1,10 +1,12 @@
 "use client";
 
 import { createProduct, updateProduct } from "@/lib/actions";
-import { FC, useActionState, useEffect, useRef } from "react";
+import { Children, FC, useActionState, useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import { SubmitButton } from "./SubmitButton";
 import { useRouter } from "next/navigation";
+import Countries from "./CountriesSelect";
+import CountriesSelect from "./CountriesSelect";
 
 interface FormErrorProps {
   errors?: string[];
@@ -31,7 +33,13 @@ const FormError: FC<FormErrorProps> = ({ errors }) => {
   );
 };
 
-export default function ProductForm({ product }: { product?: any }) {
+export default function ProductForm({
+  product,
+  children,
+}: {
+  product?: any;
+  children?: any;
+}) {
   const [state, formAction] = useFormState(
     (prevState: any, formData: FormData) => {
       if (!product) {
@@ -83,6 +91,11 @@ export default function ProductForm({ product }: { product?: any }) {
                 : undefined
             }
           />
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-gray-700 font-medium">Countries:</label>
+          {children}
         </div>
         <div className="flex flex-col">
           <label className="text-gray-700 font-medium">Price:</label>
