@@ -1,5 +1,5 @@
-const Database = require("better-sqlite3");
-const path = require("path");
+import Database from "better-sqlite3";
+import path from "path";
 
 // Veritabanı bağlantısını açma fonksiyonu
 export function connectToDatabase() {

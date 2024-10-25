@@ -1,5 +1,5 @@
-const Database = require("better-sqlite3");
-const Chance = require("chance");
+import Database from "better-sqlite3";
+import Chance from "chance";
 const chance = new Chance();
 
 // Veritabanı bağlantısı
